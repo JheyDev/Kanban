@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Kanban Pessoal</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <!-- Cabeçalho Principal do Kanban -->
+    <header class="kanban-header">
+    <h1>Meu Kanban Pessoal</h1>
+    <div class="header-actions">
+        <button id="addTaskButton" class="global-button add-task-btn" onclick="openNewTaskModal(null, false)">
+            <i class="fas fa-plus"></i> Nova Tarefa
+        </button>
+    </div>
+</header>
+
+    <!-- Wrapper para o Board Kanban (sempre visível no modo frontend-only) -->
+    <div class="kanban-board-wrapper">
+        <!-- Primeira Linha de Colunas -->
+        <div class="kanban-board">
+            <!-- Coluna Backlog -->
+            <div class="column" data-status="backlog">
+                <h2>📌 Backlog</h2>
+                <div class="card-container">
+                    <!-- Cards de tarefas serão renderizados aqui pelo JavaScript -->
+                </div>
+            </div>
+
+            <!-- Coluna Em Análise -->
+            <div class="column" data-status="analise">
+                <h2>🔍 Em Análise</h2>
+                <div class="card-container"></div>
+            </div>
+
+            <!-- Coluna Em Desenvolvimento -->
+            <div class="column" data-status="desenvolvimento">
+                <h2>💻 Em Desenvolvimento</h2>
+                <div class="card-container"></div>
+            </div>
+        </div>
+
+        <!-- Segunda Linha de Colunas -->
+        <div class="kanban-board">
+            <!-- Coluna Em Testes -->
+            <div class="column" data-status="testes">
+                <h2>🧪 Em Testes</h2>
+                <div class="card-container"></div>
+            </div>
+
+            <!-- Coluna Aguardando Aprovação -->
+            <div class="column" data-status="aguardando-aprovacao">
+                <h2>⏳ Aguardando Aprovação</h2>
+                <div class="card-container"></div>
+            </div>
+
+            <!-- Coluna Concluído -->
+            <div class="column" data-status="concluido">
+                <h2>✅ Concluído</h2>
+                <div class="card-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Nova Tarefa / Edição -->
+    <div id="newTaskModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeNewTaskModal()">&times;</span>
+            <h2 id="newTaskModalTitle">Nova Tarefa</h2>
+            <form id="newTaskForm">
+                <input type="hidden" id="taskId">
+                <div class="form-group">
+                    <label for="taskTitle">Título da Tarefa:</label>
+                    <input type="text" id="taskTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskDescription">Descrição:</label>
+                    <textarea id="taskDescription" required></textarea>
+                </div>
+                <!-- Campo para Upload de Imagem - REMOVIDO: funcionalidade depende de API de armazenamento -->
+                <!-- No frontend-only, não temos um backend para salvar imagens. -->
+                <!-- <div class="form-group">
+                    <label for="taskImage">Anexar Imagem (Opcional):</label>
+                    <input type="file" id="taskImage" accept="image/*">
+                    <small class="help-text">
+                        A imagem será salva no servidor backend. Imagens muito grandes podem impactar o desempenho.
+                    </small>
+                </div> -->
+                <div class="form-group">
+                    <label for="taskType">Tipo de Atividade:</label>
+                    <select id="taskType" required>
+                        <option value="">Selecione um tipo</option>
+                        <option value="bug">Bug</option>
+                        <option value="melhoria">Melhoria</option>
+                        <option value="nova-funcionalidade">Nova Funcionalidade</option>
+                        <option value="refatoracao">Refatoração</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="taskUrgency">Prioridade (Urgência):</label>
+                    <select id="taskUrgency" required>
+                        <option value="">Selecione uma prioridade</option>
+                        <option value="baixa">Baixa</option>
+                        <option value="media">Média</option>
+                        <option value="alta">Alta</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="taskStatus">Status da Tarefa:</label>
+                    <select id="taskStatus" required>
+                        <option value="">Selecione um status</option>
+                        <option value="backlog">📌 Backlog</option>
+                        <option value="analise">🔍 Em Análise</option>
+                        <option value="desenvolvimento">💻 Em Desenvolvimento</option>
+                        <option value="testes">🧪 Em Testes</option>
+                        <option value="aguardando-aprovacao">⏳ Aguardando Aprovação</option>
+                        <option value="concluido">✅ Concluído</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="taskReporter">Solicitante:</label>
+                    <input type="text" id="taskReporter">
+                </div>
+                <div class="form-group">
+                    <label for="taskEstimatedDue">Prazo Estimado:</label>
+                    <input type="datetime-local" id="taskEstimatedDue">
+                </div>
+                <div class="form-group">
+                    <label for="taskResponsible">Responsável:</label>
+                    <input type="text" id="taskResponsible">
+                </div>
+                <div class="form-group">
+                    <label for="taskObservation">Observação:</label>
+                    <textarea id="taskObservation"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" id="saveTaskButton">Adicionar Tarefa</button>
+                    <button type="button" onclick="closeNewTaskModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Detalhes da Tarefa -->
+    <div id="taskDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeTaskDetailsModal()">&times;</span>
+            <h2 id="detailTaskTitle">Detalhes da Tarefa</h2>
+            <div class="detail-group">
+                <strong>Descrição:</strong> <span id="detailTaskDescription"></span>
+            </div>
+            <!-- Exibição da Imagem - REMOVIDO: funcionalidade depende de API de armazenamento -->
+            <!-- <div class="detail-group">
+                <img id="detailTaskImage" class="task-detail-image" alt="Imagem da Tarefa">
+            </div> -->
+            <div class="detail-group">
+                <strong>Tipo de Atividade:</strong> <span id="detailTaskType"></span>
+            </div>
+            <div class="detail-group">
+                <strong>Prioridade:</strong> <span id="detailTaskUrgency"></span>
+            </div>
+            <div class="detail-group">
+                <strong>Solicitante:</strong> <span id="detailTaskReporter"></span>
+            </div>
+            <div class="detail-group">
+                <strong>Data de Criação:</strong> <span id="detailTaskCreationDate"></span>
+            </div>
+            <div class="detail-group">
+                <strong>Prazo Estimado:</strong> <span id="detailTaskEstimatedDue"></span>
+            </div>
+            <div class="detail-group">
+                <strong>Responsável:</strong> <span id="detailTaskResponsible"></span>
+            </div>
+            <div class="detail-group">
+                <strong>Observação:</strong> <span id="detailTaskObservation"></span>
+            </div>
+            <div class="detail-group">
+                <strong>Status Atual:</strong> <span id="detailTaskCurrentStatus"></span>
+            </div>
+
+            <h3>Comentários</h3>
+            <div id="commentsContainer">
+                <!-- Comentários serão carregados aqui -->
+            </div>
+            <div class="comment-input-group">
+                <textarea id="newCommentText" placeholder="Adicione um comentário..."></textarea>
+                <button onclick="addComment()">Adicionar Comentário</button>
+            </div>
+            
+            <div class="form-actions-details">
+                <button onclick="editTaskFromDetails()">Editar Tarefa</button>
+                <button onclick="deleteTaskFromDetails()">Remover Tarefa</button>
+                <button onclick="closeTaskDetailsModal()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

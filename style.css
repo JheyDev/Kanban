@@ -1,0 +1,860 @@
+/* =========================================================================
+   1. Estilos Globais e Reset Básico
+   ========================================================================= */
+body {
+    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #F8F8F8; /* Cinza claro */
+    color: #333333; /* Texto cinza escuro padrão */
+    line-height: 1.6;
+    font-size: 16px;
+    overflow-x: hidden; /* Garante que não haja rolagem horizontal indesejada no body */
+}
+
+/* =========================================================================
+   2. Estilos do Cabeçalho Global
+   ========================================================================= */
+.kanban-header {
+    display: flex;
+    justify-content: space-between; /* Alinha o título à esquerda e o botão à direita */
+    align-items: center; /* Centraliza verticalmente os itens */
+    padding: 15px 25px; /* Mais padding para o cabeçalho */
+    background-color: #212121; /* Preto para o cabeçalho */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Sombra mais escura */
+    border-bottom: 1px solid #424242; /* Linha sutil na parte inferior */
+    flex-wrap: wrap; /* Permite quebrar linha em telas pequenas */
+    gap: 15px; /* Espaço entre itens em telas menores */
+}
+
+.kanban-header h1 {
+    margin: 0; /* Remover margem padrão do h1 */
+    font-size: 1.8em; /* Tamanho maior para o título principal */
+    color: #E0E0E0; /* Cinza muito claro para o título */
+}
+
+/* Estilo para o botão "Adicionar Nova Tarefa" no cabeçalho */
+.global-add-task-btn {
+    width: auto; /* A largura se ajusta ao conteúdo */
+    margin: 0; /* Remove margens que eram para a coluna */
+    padding: 10px 20px; /* Mais padding para ser um botão mais proeminente */
+    font-size: 1em; /* Tamanho da fonte normal */
+    background-color: #8E24AA; /* Roxo vibrante */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.global-add-task-btn:hover {
+    background-color: #6A1B9A; /* Roxo mais escuro no hover */
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* =========================================================================
+   7. Estilos do Botão "Adicionar Nova Tarefa" (AGORA APENAS PARA O GLOBAL)
+   ========================================================================= */
+.global-button.add-task-btn { /* Use esta combinação para ser mais específico */
+    width: auto;
+    margin: 0;
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #8E24AA;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    /* Adicionado para permitir o alinhamento flex do conteúdo interno */
+    display: flex; /* Transforma o botão em um flex container */
+    align-items: center; /* Centraliza verticalmente o ícone e o texto */
+    justify-content: center; /* Centraliza horizontalmente o ícone e o texto */
+    gap: 8px; /* Espaço entre o ícone e o texto */
+}
+
+.global-button.add-task-btn:hover {
+    background-color: #6A1B9A;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Estilo para o ícone Font Awesome dentro do botão de adicionar tarefa */
+.global-button.add-task-btn .fas.fa-plus {
+    font-size: 1.1em; /* Tamanho ligeiramente maior para o ícone */
+    color: white; /* Garante que a cor do ícone seja branca */
+    /* Não precisa de margin-right aqui por causa do 'gap' no pai flex */
+}
+
+/* =========================================================================
+   3. Container Principal do Kanban Board (Wrapper para múltiplas linhas)
+   ========================================================================= */
+.kanban-board-wrapper {
+    padding: 20px; /* Mantém um padding externo para o board como um todo */
+    display: flex;
+    flex-direction: column; /* As "linhas" do board (kanban-board) empilham verticalmente */
+    gap: 20px; /* Espaço entre as duas linhas do board */
+    justify-content: flex-start; /* Alinha as linhas ao topo */
+    min-height: calc(100vh - 70px - 40px); /* Ajuste: 100vh - altura cabeçalho - padding do wrapper */
+    align-items: center; /* Centraliza as linhas horizontalmente */
+    box-sizing: border-box;
+}
+
+/* Estilo para cada "linha" do board (que contém as colunas) */
+.kanban-board {
+    display: flex;
+    gap: 16px; /* Espaço entre as colunas */
+    padding: 20px; /* Padding interno de cada linha do board */
+    background-color: #ffffff; /* Fundo branco para cada linha, mantém claridade */
+    border-radius: 8px; /* Bordas arredondadas para cada linha */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra mais suave e espalhada */
+    min-height: unset; /* Altura se ajusta ao conteúdo de cada linha */
+    align-items: flex-start;
+    width: 100%; /* Ocupa 100% da largura do wrapper */
+    max-width: 100%; /* Garante que não ultrapasse 100% */
+    box-sizing: border-box;
+    flex-wrap: wrap; /* Permite que as colunas quebrem para a próxima linha SE não couberem */
+    justify-content: flex-start; /* Alinha as colunas à esquerda dentro de cada linha */
+    overflow-x: hidden; /* Oculta a rolagem horizontal interna, deixando o body lidar com isso */
+}
+
+/* =========================================================================
+   4. Estilos das Colunas (Listas)
+   ========================================================================= */
+.column {
+    flex: 1; /* CRÍTICO: Faz as colunas crescerem e encolherem para preencher o espaço */
+    min-width: 220px; /* Largura mínima para cada coluna antes de quebrar linha ou squishar */
+    background-color: #EEEEEE; /* Cinza claro para cada coluna */
+    border-radius: 6px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    min-height: 150px; /* Altura mínima para colunas vazias */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-sizing: border-box;
+    overflow-y: auto; /* Adiciona rolagem vertical se a coluna tiver muitos cards */
+    max-height: calc( ((100vh - 70px - 40px - 20px) / 2) - 12px - 40px ); /* Ajuste refinado para forçar o scroll interno mais cedo */
+}
+
+.column h2 {
+    font-size: 1.05em;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: #424242; /* Cinza escuro para os títulos das colunas */
+    text-align: center;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 0;
+}
+
+/* Títulos de coluna que podem quebrar linha a partir de "Em Testes" */
+.column[data-status="testes"] h2,
+.column[data-status="aguardando-aprovacao"] h2,
+.column[data-status="concluido"] h2 {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+.column .card-container {
+    flex-grow: 1;
+    min-height: 30px;
+    padding-bottom: 10px;
+}
+
+.column.drag-over .card-container {
+    border: 2px dashed #FFEB3B; /* Amarelo claro para borda de arrasto */
+    background-color: #FFFDE7; /* Fundo amarelo muito claro */
+    border-radius: 6px;
+}
+
+/* =========================================================================
+   5. Estilos dos Cards (Tarefas)
+   ========================================================================= */
+.card {
+    background-color: #ffffff;
+    border-radius: 5px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    cursor: grab;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border-left: 4px solid;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    min-height: 120px; /* Aumentado para acomodar a nova linha de info */
+    position: relative;
+}
+
+.card:last-child {
+    margin-bottom: 0;
+}
+
+.card:active {
+    cursor: grabbing;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.card-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.card-title {
+    font-size: 0.95em;
+    font-weight: 600;
+    color: #212121; /* Preto para o título do card */
+    word-break: break-word;
+    flex-grow: 1;
+    line-height: 1.2;
+}
+
+/* Truncamento para títulos de cards */
+.column[data-status="backlog"] .card-title,
+.column[data-status="analise"] .card-title,
+.column[data-status="desenvolvimento"] .card-title {
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.card-responsible-name {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75em;
+    color: #616161; /* Cinza médio para responsável */
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-align: right;
+}
+
+.card-middle-row {
+    display: flex;
+    justify-content: flex-start; /* Alinha tags à esquerda */
+    align-items: center;
+    font-size: 0.8em;
+    color: #616161; /* Cinza médio para detalhes do card */
+    margin-top: 4px;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.card-bottom-row { /* NOVO: Linha para prazo e data de criação */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75em;
+    color: #616161;
+    margin-top: 4px;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.card-due-date {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 1em; /* Ajuste para ter um tamanho legível */
+    white-space: nowrap;
+}
+
+.card-creation-info { /* NOVO: Estilo para a data de criação */
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 1em; /* Um pouco menor que o prazo */
+    color: #757575; /* Cinza para a data de criação */
+    white-space: nowrap;
+    margin-left: auto; /* Empurra para a direita */
+}
+
+.tag {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75em;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.prioridade-alta { background-color: #D32F2F; } /* Vermelho escuro para alta */
+.prioridade-media { background-color: #FFC107; color: #333;} /* Amarelo para média */
+.prioridade-baixa { background-color: #4CAF50; } /* Verde para baixa */
+.prioridade-desconhecida { background-color: #9E9E9E; } /* Cinza para desconhecida */
+
+.tipo-bug { background-color: #D32F2F; } /* Vermelho escuro para bug */
+.tipo-melhoria { background-color: #8E24AA; } /* Roxo para melhoria */
+.tipo-nova-funcionalidade { background-color: #4CAF50; } /* Verde para nova funcionalidade */
+.tipo-refatoracao { background-color: #FFC107; color: #333;} /* Amarelo para refatoração */
+.tipo-desconhecido { background-color: #9E9E9E; } /* Cinza para desconhecido */
+
+.card-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.card-actions button {
+    background-color: #7B1FA2; /* Roxo para botões de ação */
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.75em;
+    font-weight: 600;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-actions button:hover {
+    background-color: #6A1B9A; /* Roxo mais escuro no hover */
+    transform: translateY(-1px);
+}
+
+/* Estilo para o remove-btn quando está dentro de card-actions */
+.card-actions .remove-btn {
+    position: static;
+    width: auto;
+    height: auto;
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 0.75em;
+    background-color: #BDBDBD; /* Cinza para o botão de remover */
+    color: #424242; /* Texto cinza escuro */
+}
+.card-actions .remove-btn:hover {
+    background-color: #9E9E9E; /* Cinza mais escuro no hover */
+    color: #212121;
+}
+
+
+/* =========================================================================
+   6. Estilos das Cores dos Cards por Status (Borda Esquerda)
+   ========================================================================= */
+.card.status-backlog { border-left-color: #757575; } /* Cinza escuro para backlog */
+.card.status-analise { border-left-color: #FFD100; } /* Amarelo para em análise */
+.card.status-desenvolvimento { border-left-color: #8E24AA; } /* Roxo para desenvolvimento */
+.card.status-testes { border-left-color: #BDBDBD; } /* Cinza médio para testes */
+.card.status-aguardando-aprovacao { border-left-color: #673AB7; } /* Um tom de roxo mais escuro para aprovação */
+.card.status-concluido { border-left-color: #4CAF50; } /* Mantido verde para concluído (semântica) */
+
+.card[data-is-completed="true"] {
+    opacity: 0.8;
+}
+
+/* =========================================================================
+   7. Estilos do Botão "Adicionar Nova Tarefa" (AGORA APENAS PARA O GLOBAL)
+   ========================================================================= */
+/* Este estilo é para o botão global, já movido para o header. */
+
+
+/* =========================================================================
+   8. Estilos dos Modais (Nova Tarefa e Detalhes da Tarefa)
+   ========================================================================= */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 20px;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    box-sizing: border-box;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+.modal-content h2 {
+    font-size: 1.4em;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #212121; /* Preto para o título do modal */
+    text-align: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.close-button {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    color: #616161; /* Cinza para o botão de fechar */
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #212121; /* Preto no hover */
+    text-decoration: none;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.modal-content form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #424242; /* Cinza escuro para labels */
+    font-size: 0.9em;
+}
+
+.modal-content form input[type="text"],
+.modal-content form input[type="datetime-local"], /* Ajustado para datetime-local */
+.modal-content form textarea,
+.modal-content form select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #BDBDBD; /* Cinza claro para borda de inputs */
+    border-radius: 4px;
+    font-size: 0.95em;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modal-content form input:focus,
+.modal-content form textarea:focus,
+.modal-content form select:focus {
+    border-color: #8E24AA; /* Roxo no foco */
+    box-shadow: 0 0 0 2px rgba(142, 36, 170, 0.2); /* Sombra roxa no foco */
+    outline: none;
+}
+
+.modal-content form textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.form-actions button {
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.95em;
+    font-weight: 600;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.form-actions button[type="submit"] {
+    background-color: #8E24AA; /* Roxo para o botão de submit */
+    color: white;
+    border: none;
+}
+
+.form-actions button[type="submit"]:hover {
+    background-color: #6A1B9A; /* Roxo mais escuro no hover */
+    transform: translateY(-1px);
+}
+
+.form-actions button[type="button"] {
+    background-color: #E0E0E0; /* Cinza claro para botão de cancelar */
+    color: #333;
+    border: 1px solid #BDBDBD; /* Borda cinza */
+}
+
+.form-actions button[type="button"]:hover {
+    background-color: #CCCCCC; /* Cinza um pouco mais escuro no hover */
+    transform: translateY(-1px);
+}
+
+/* =========================================================================
+   9. Estilos para o Modal de Detalhes da Tarefa
+   ========================================================================= */
+#taskDetailsModal .modal-content {
+    max-width: 650px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+.detail-group {
+    margin-bottom: 12px;
+    font-size: 0.95em;
+    color: #424242; /* Cinza escuro para detalhes */
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.detail-group strong {
+    color: #212121; /* Preto para os títulos dos detalhes */
+    display: inline-block;
+    min-width: 120px;
+    flex-shrink: 0;
+}
+
+/* NOVO: Estilo para a imagem no modal de detalhes */
+.task-detail-image {
+    max-width: 100%;
+    height: auto; /* Mantém a proporção da imagem */
+    display: block; /* Remove espaço extra abaixo da imagem */
+    margin: 15px auto; /* Centraliza e adiciona margem vertical */
+    border-radius: 8px; /* Bordas arredondadas para a imagem */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Sombra sutil */
+    /* Garante que a imagem não apareça se não tiver src */
+    max-height: 300px; /* Limita a altura máxima da imagem */
+    object-fit: contain; /* Ajusta a imagem dentro do container sem cortar */
+}
+
+
+#commentsContainer {
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    padding-top: 15px;
+    margin-top: 20px;
+    max-height: 250px;
+    overflow-y: auto;
+    border-radius: 4px;
+    background-color: #F5F5F5; /* Cinza muito claro para container de comentários */
+    padding: 15px;
+}
+
+.comment {
+    background-color: #E0E0E0; /* Cinza claro para comentários */
+    border-radius: 5px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    font-size: 0.88em;
+    color: #333;
+    position: relative;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.comment strong {
+    color: #212121; /* Preto para o nome do autor do comentário */
+    margin-right: 5px;
+}
+
+.comment-date {
+    font-size: 0.75em;
+    color: #757575; /* Cinza para a data do comentário */
+    display: block;
+    margin-top: 5px;
+    text-align: right;
+}
+
+.comment-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+#newCommentText {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #BDBDBD; /* Cinza claro */
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 80px;
+    font-size: 0.9em;
+    box-sizing: border-box;
+}
+
+.comment-input-group button {
+    background-color: #8E24AA; /* Roxo para o botão de adicionar comentário */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.comment-input-group button:hover {
+    background-color: #6A1B9A; /* Roxo mais escuro no hover */
+    transform: translateY(-1px);
+}
+
+.form-actions-details {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.form-actions-details button {
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.form-actions-details button:nth-child(1) {
+    background-color: #8E24AA; /* Roxo para o botão de editar tarefa */
+    color: white;
+    border: none;
+}
+.form-actions-details button:nth-child(1):hover {
+    background-color: #6A1B9A; /* Roxo mais escuro no hover */
+}
+
+.form-actions-details button:nth-child(2) {
+    background-color: #D32F2F; /* Vermelho escuro para remover (semântica) */
+    color: white;
+    border: none;
+}
+.form-actions-details button:nth-child(2):hover {
+    background-color: #C62828;
+}
+
+.form-actions-details button:nth-child(3) {
+    background-color: #E0E0E0; /* Cinza claro para fechar */
+    color: #333;
+    border: 1px solid #BDBDBD;
+}
+.form-actions-details button[type="button"]:hover {
+    background-color: #CCCCCC;
+    transform: translateY(-1px);
+}
+
+/* =========================================================================
+   10. Responsividade Básica (Aprimorada)
+   ========================================================================= */
+@media (max-width: 992px) {
+    .column {
+        min-width: 220px;
+    }
+}
+
+@media (max-width: 768px) {
+    .kanban-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px;
+    }
+    .kanban-header h1 {
+        margin-bottom: 10px;
+    }
+    .global-add-task-btn {
+        width: 100%;
+    }
+
+    .kanban-board-wrapper {
+        padding: 15px;
+        gap: 15px;
+        min-height: unset;
+    }
+
+    .kanban-board {
+        flex-direction: column;
+        align-items: center;
+        padding: 15px;
+        min-height: unset;
+        max-width: 100%;
+        flex-wrap: nowrap;
+    }
+
+    .column {
+        width: 100%;
+        max-width: 380px;
+        margin-bottom: 15px;
+        max-height: calc(100vh - 220px);
+    }
+
+    .column:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Ajustes para os Cards em telas menores para reduzir "amontoado" */
+    .card {
+        padding: 6px 8px;
+        min-height: 110px; /* Aumentado ligeiramente para a nova linha de data/hora */
+    }
+
+    .card-main-content {
+        gap: 2px;
+    }
+
+    .card-top-row {
+        gap: 4px;
+    }
+
+    .card-title {
+        font-size: 0.9em;
+    }
+
+    .card-responsible-name {
+        font-size: 0.7em;
+    }
+
+    .card-middle-row {
+        font-size: 0.75em;
+        margin-top: 2px;
+        gap: 4px;
+    }
+
+    .card-bottom-row {
+        font-size: 0.7em;
+        margin-top: 2px;
+        gap: 4px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .card-due-date, .card-creation-info {
+        width: 100%;
+        margin-left: 0;
+    }
+
+
+    .tag {
+        padding: 3px 6px;
+        font-size: 0.7em;
+    }
+
+    .card-actions {
+        gap: 4px;
+        margin-top: 6px;
+        padding-top: 6px;
+        flex-wrap: wrap;
+    }
+
+    .card-actions button {
+        padding: 4px 8px;
+        font-size: 0.7em;
+        flex-basis: calc(50% - 2px);
+        box-sizing: border-box;
+    }
+
+    .card-actions .remove-btn {
+        flex-basis: calc(33% - 4px);
+    }
+
+
+    .modal {
+        padding: 10px;
+    }
+
+    .modal-content {
+        max-width: 95%;
+        padding: 20px;
+    }
+
+    .form-actions button {
+        padding: 8px 12px;
+        font-size: 0.85em;
+    }
+
+    .comment-input-group button {
+        padding: 6px 10px;
+        font-size: 0.8em;
+    }
+
+    .form-actions-details button {
+        padding: 8px 12px;
+        font-size: 0.85em;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        font-size: 15px;
+    }
+
+    .kanban-board-wrapper {
+        padding: 10px;
+    }
+
+    .column {
+        padding: 10px;
+        max-width: 100%;
+        max-height: calc(100vh - 180px);
+    }
+
+    .card {
+        padding: 8px 8px;
+        min-height: 100px; /* Ajustado para telas muito pequenas */
+    }
+
+    .card-title {
+        font-size: 0.85em;
+    }
+
+    .card-responsible-name,
+    .card-due-date,
+    .card-creation-info,
+    .tag,
+    .card-actions button {
+        font-size: 0.65em;
+    }
+
+    .card-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .modal-content {
+        padding: 15px;
+    }
+}

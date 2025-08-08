@@ -110,7 +110,7 @@ body {
     display: flex;
     gap: 16px; /* Espaço entre as colunas */
     padding: 20px; /* Padding interno de cada linha do board */
-    background-color: #ffffff; /* Fundo branco para cada linha, mantém claridade */
+    background-color: #d4d2d2; /* Fundo branco para cada linha, mantém claridade */
     border-radius: 8px; /* Bordas arredondadas para cada linha */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra mais suave e espalhada */
     min-height: unset; /* Altura se ajusta ao conteúdo de cada linha */
@@ -129,13 +129,13 @@ body {
 .column {
     flex: 1; /* CRÍTICO: Faz as colunas crescerem e encolherem para preencher o espaço */
     min-width: 220px; /* Largura mínima para cada coluna antes de quebrar linha ou squishar */
-    background-color: #EEEEEE; /* Cinza claro para cada coluna */
+    background-color: #ffffff; /* Cinza claro para cada coluna */
     border-radius: 6px;
     padding: 12px;
     display: flex;
     flex-direction: column;
     min-height: 150px; /* Altura mínima para colunas vazias */
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.356);
     box-sizing: border-box;
     overflow-y: auto; /* Adiciona rolagem vertical se a coluna tiver muitos cards */
     max-height: calc( ((100vh - 70px - 40px - 20px) / 2) - 12px - 40px ); /* Ajuste refinado para forçar o scroll interno mais cedo */

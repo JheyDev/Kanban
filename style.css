@@ -129,7 +129,7 @@ body {
 .column {
     flex: 1; /* CRÍTICO: Faz as colunas crescerem e encolherem para preencher o espaço */
     min-width: 220px; /* Largura mínima para cada coluna antes de quebrar linha ou squishar */
-    background-color: #ffffff; /* Cinza claro para cada coluna */
+    background-color: #e0e0e0; /* Cinza claro para cada coluna */
     border-radius: 6px;
     padding: 12px;
     display: flex;
